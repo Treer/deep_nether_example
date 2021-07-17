@@ -19,5 +19,3 @@ The realm this mod creates is kept simple. Fork and adapt it, make it richer, ma
 **Screenshots:**
 
 ![default](screenshot.jpg)
-
-![default](https://github.com/Treer/deep_nether_example/raw/master/screenshot.jpg)
