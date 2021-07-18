@@ -24,7 +24,6 @@
   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
   IN THE SOFTWARE.
-
 ]]--
 
 local S = nether.get_translator
@@ -36,7 +35,8 @@ end
 -- Global deepnether namespace
 deepnether               = {}
 deepnether.fogColor      = "#3D1504"
-deepnether.modname       = minetest.get_current_modname()
+deepnether.modName       = minetest.get_current_modname() -- set the name by changing mod.conf
+deepnether.portalName    = S("Deep-Nether Portal")
 deepnether.DEPTH_CEILING = math.floor((nether.DEPTH_FLOOR_LAYERS - 6) / 80) * 80
 deepnether.DEPTH_FLOOR   = deepnether.DEPTH_CEILING - (80 * 3)
 deepnether.BUFFER_ZONE   = 70
@@ -50,14 +50,14 @@ nether.DEPTH_FLOOR_LAYERS = deepnether.DEPTH_FLOOR
 if nether.mapgen ~= nil and nether.mapgen.shift_existing_biomes ~= nil then
 	nether.mapgen.shift_existing_biomes(deepnether.DEPTH_FLOOR, deepnether.DEPTH_CEILING)
 else
-	minetest.log("warning", deepnether.modname .. " was unable to shift existing biomes, the " .. deepnether.modname .. " biome may have incomplete coverage.");
+	minetest.log("warning", deepnether.modName .. " was unable to shift existing biomes, the " .. deepnether.modName .. " biome may have incomplete coverage.");
 end
 
 --============--
 --== Portal ==--
 --============--
 
-local portalName = deepnether.modname .. "_portal"
+local portalName = deepnether.modName .. "_portal"
 
 -- Use the Portal API to add a portal type which goes between the Nether and this Nether layer
 -- See portal_api.txt for documentation
@@ -76,7 +76,7 @@ local portalRegistered = nether.register_portal(portalName, {
 		},
 		scale = 1.5
 	},
-	title = S("Deep-Nether Portal"),
+	title = deepnether.portalName,
 	book_of_portals_pagetext = S([[Construction requires 14 blocks of hewn basalt, which we obtained from basalt islands in the lava lakes of the Nether. The finished frame is four blocks wide, five blocks high, and stands vertically, like a doorway.
 
 This portal takes you out of the frying pan and into the fire, oh what I would give for sunlight, trees, and birdsong.]]),
@@ -138,7 +138,7 @@ This portal takes you out of the frying pan and into the fire, oh what I would g
 			size.z = temp_x
 		end
 		local pos2 = {x = pos1.x + (size.x - 1), y = pos1.y + (size.y - 1), z = pos1.z + (size.z - 1)}
-		pos1.y = pos1.y - 3 -- include the ground below the portal schematic
+		pos1.y = pos1.y - 4 -- include the ground below the portal schematic
 
 		-- scan for lava
 		local lavaPositions = minetest.find_nodes_in_area(pos1, pos2, {"nether:lava_source", "nether:lava_crust"})
@@ -179,7 +179,7 @@ This portal takes you out of the frying pan and into the fire, oh what I would g
 })
 
 if not portalRegistered then
-	error(deepnether.modname .. " was unable to register its portal. Perhaps another mod has already registered one with the same shape and material. Check for errors in the debug.txt file for more details.")
+	error(deepnether.modName .. " was unable to register its portal. Perhaps another mod has already registered one with the same shape and material. Check for errors in the debug.txt file for more details.")
 end
 
 
@@ -258,12 +258,11 @@ end
 -- lua on_generate() callback will carve the caverns with nether:rack_deep before invoking
 -- generate_decorations and generate_ores.
 minetest.register_biome({
-	name = deepnether.modname .. "_caverns",
+	name = deepnether.modName .. "_caverns",
 	node_stone  = "nether:native_mapgen", -- nether:native_mapgen is used here to prevent the native mapgen from placing ores and decorations.
 	node_filler = "nether:native_mapgen", -- The lua on_generate will transform nether:native_mapgen into nether:rack then decorate and add ores.
 	node_dungeon = "nether:brick_deep",
-	-- Setting node_cave_liquid to "air" avoids the need to filter lava and water out of the mapchunk and
-	-- surrounding shell (overdraw nodes beyond the mapchunk).
+	-- Setting node_cave_liquid to "air" avoid lava and water being generated mid-air in the caverns and making a mess.
 	node_cave_liquid = "air",
 	y_max = deepnether.DEPTH_CEILING,
 	y_min = deepnether.DEPTH_FLOOR,
@@ -298,10 +297,10 @@ minetest.register_ore({ -- adds glowstones near the ground for more light
 local fumaroleDecoration = minetest.registered_decorations["Sunken nether fumarole"]
 if fumaroleDecoration == nil then
 	-- the nether realm might be disabled, or the name of the fumarole decoration changed
-	minetest.log("warning", deepnether.modname .. " was unable to find the nether fumarole decoration, so will skip it.")
+	minetest.log("warning", deepnether.modName .. " was unable to find the nether fumarole decoration, so will skip it.")
  else
 	minetest.register_decoration({
-		name           = deepnether.modname .. " fumarole",
+		name           = deepnether.modName .. " fumarole",
 		place_on       = {"nether:rack_deep"},
 		sidelen        = 80,
 		fill_ratio     = 0.01,
