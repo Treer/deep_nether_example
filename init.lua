@@ -26,7 +26,10 @@
   IN THE SOFTWARE.
 ]]--
 
-local S = nether.get_translator
+if minetest.get_translator == nil then
+	error(S("The @1 mod requires Minetest 5", minetest.get_current_modname()), 0)
+end
+local S = minetest.get_translator(minetest.get_current_modname())
 
 if not nether.useBiomes then
 	error(S("The @1 mod requires the Nether biomes mapgen", minetest.get_current_modname()), 0)
@@ -34,7 +37,7 @@ end
 
 -- Global deepnether namespace
 deepnether               = {}
-deepnether.fogColor      = "#3D1504"
+deepnether.fogColor      = "#3D1500"
 deepnether.modName       = minetest.get_current_modname() -- set the name by changing mod.conf
 deepnether.portalName    = S("Deep-Nether Portal")
 deepnether.DEPTH_CEILING = math.floor((nether.DEPTH_FLOOR_LAYERS - 6) / 80) * 80
@@ -315,8 +318,8 @@ if fumaroleDecoration == nil then
 end
 
 local np_cave = {
-	offset     = 0,
-	scale      = 1,
+	offset     = -0.05, -- make the scale range -1 to +0.9, so that abs(noise) will provide two different scales of peak
+	scale      = 0.95,
 	spread     = {x = 128, y = 128, z = 128},
 	seed       = 59033,
 	octaves    = 7,
@@ -349,6 +352,7 @@ local function on_generated(minp, maxp, seed)
 	local x1, y1, z1 = maxp.x, math.min(maxp.y, deepnether.DEPTH_CEILING), maxp.z
 	local yCaveStride = x1 - x0 + 1
 	local ystride = area.ystride
+	local math_abs = math.abs
 
 	nobj_cave = nobj_cave or minetest.get_perlin_map(np_cave, {x = yCaveStride, y = yCaveStride})
 	local nvals_cave = nobj_cave:get_2d_map_flat({x=minp.x, y=minp.z}, {x=yCaveStride, y=yCaveStride}, nbuf_cave)
@@ -357,10 +361,10 @@ local function on_generated(minp, maxp, seed)
 		local vi_xz = area:index(x0, y0, z) -- Initial voxelmanip index
 		local noise_i = 1 + (z - z0) * yCaveStride
 		for x = x0, x1 do
-			local noise = nvals_cave[noise_i]
-			local noiseFourthPower = noise * noise * noise * noise -- always positive
-			local ceil_y  = CAVERN_CEILING - (0.68 * CAVERN_HEIGHT) * noiseFourthPower
-			local floor_y = CAVERN_FLOOR   + (0.3  * CAVERN_HEIGHT) * (noiseFourthPower * noise * noise / 1.6 + noise / 3)
+			local noise = math_abs(nvals_cave[noise_i])
+			local noiseSquared = noise * noise
+			local ceil_y  = CAVERN_CEILING - (0.68 * CAVERN_HEIGHT) * noiseSquared * noiseSquared
+			local floor_y = CAVERN_FLOOR   + (0.3  * CAVERN_HEIGHT) * (noiseSquared * noiseSquared * noiseSquared / 1.6 + noise / 3)
 
 			local vi = vi_xz
 			for y = y0, y1 do
