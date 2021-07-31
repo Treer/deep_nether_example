@@ -2,7 +2,9 @@
   Deep Nether (mod for Minetest)
 
   A template example for adding Nether "layers" - deeper realms in the Nether.
-  Fork and adapt it and make it your own.
+  Fork and adapt it.
+
+  See nether_api.txt in the nether mod for more interop coding info.
 
 
   Copyright 2021 Treer
