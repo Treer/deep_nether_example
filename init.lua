@@ -28,19 +28,25 @@
   IN THE SOFTWARE.
 ]]--
 
+-- Local deepnether namespace. (if made global it should probably be renamed)
+local deepnether   = {}
+deepnether.modName = minetest.get_current_modname() -- set the name by changing mod.conf
+
+
 if minetest.get_translator == nil then
-	error(S("The @1 mod requires Minetest 5", minetest.get_current_modname()), 0)
+	error(S("The @1 mod requires Minetest 5", deepnether.modName), 0)
 end
-local S = minetest.get_translator(minetest.get_current_modname())
+local S = minetest.get_translator(deepnether.modName)
 
 if not nether.useBiomes then
-	error(S("The @1 mod requires the Nether biomes mapgen", minetest.get_current_modname()), 0)
+	error(S("The @1 mod requires the Nether biomes mapgen", deepnether.modName), 0)
 end
 
--- Global deepnether namespace
-deepnether               = {}
+if nether.DEPTH_FLOOR_LAYERS == nil then
+	error(S("The @1 mod requires v3.1 (or greater) of the Nether mod", deepnether.modName), 0)
+end
+
 deepnether.fogColor      = "#3D1500"
-deepnether.modName       = minetest.get_current_modname() -- set the name by changing mod.conf
 deepnether.portalName    = S("Deep-Nether Portal")
 deepnether.DEPTH_CEILING = math.floor((nether.DEPTH_FLOOR_LAYERS - 6) / 80) * 80
 deepnether.DEPTH_FLOOR   = deepnether.DEPTH_CEILING - (80 * 3)
